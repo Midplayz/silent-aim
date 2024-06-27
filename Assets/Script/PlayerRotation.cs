@@ -18,7 +18,7 @@ public class PlayerRotation : MonoBehaviour
     private float yRotation = 0f;
     private Camera playerCamera;
 
-    private bool isScoping = false;
+    public bool isScoping = false;
     private bool hasSniperMoved = false;
 
     private void Start()

@@ -1,13 +1,18 @@
+using System.Collections;
 using System.IO;
 using UnityEngine;
-using System.Collections;
 
 public class EnemySpawner : MonoBehaviour
 {
     public GameObject enemyPrefab;
     public PathDefiner[] paths;
     public Transform[] spawnPoints;
+    public Transform playerTransform;
     public float spawnInterval = 2f;
+    public int maxEnemies = 10;
+    public int numberOfSkins = 50;
+
+    private int currentEnemyCount = 0;
 
     void Start()
     {
@@ -18,15 +23,34 @@ public class EnemySpawner : MonoBehaviour
     {
         while (true)
         {
-            yield return new WaitForSeconds(spawnInterval);
+            float timeToWait = Random.Range(spawnInterval - 1, spawnInterval + 1);
+            yield return new WaitForSeconds(timeToWait);
 
-            for (int i = 0; i < spawnPoints.Length; i++)
+            if (currentEnemyCount < maxEnemies)
             {
-                GameObject enemy = Instantiate(enemyPrefab, spawnPoints[i].position, Quaternion.identity);
+                for (int i = 0; i < spawnPoints.Length; i++)
+                {
+                    if (currentEnemyCount < maxEnemies)
+                    {
+                        GameObject enemy = Instantiate(enemyPrefab, spawnPoints[i].position, Quaternion.identity);
 
-                Enemy enemyScript = enemy.GetComponent<Enemy>();
-                enemyScript.path = paths[i];
+                        int skinToUse = Random.Range(0, numberOfSkins);
+                        enemy.transform.GetChild(skinToUse).gameObject.SetActive(true);
+
+                        Enemy enemyScript = enemy.GetComponent<Enemy>();
+                        enemyScript.player = playerTransform;
+                        enemyScript.path = paths[i];
+                        enemyScript.spawner = this;
+
+                        currentEnemyCount++;
+                    }
+                }
             }
         }
+    }
+
+    public void DecreaseEnemyCount()
+    {
+        currentEnemyCount--;
     }
 }

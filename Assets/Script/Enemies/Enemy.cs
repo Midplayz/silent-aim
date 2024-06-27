@@ -1,15 +1,17 @@
 using UnityEngine;
-using System.Collections;
-using System.IO;
 
 public class Enemy : MonoBehaviour
 {
     public PathDefiner path;
-    public float speed = 5f;
+    public float speed = 5f; //WalkAnimation zombie is 0.25
     public float offsetRange = 10f;
+    public EnemySpawner spawner;
+    public Transform player; 
+    public float stopDistance = 3f; 
 
     private int currentWaypointIndex = 0;
     private Vector3 targetPosition;
+    private bool targetingPlayer = false;
 
     void Start()
     {
@@ -20,6 +22,18 @@ public class Enemy : MonoBehaviour
     }
 
     void Update()
+    {
+        if (targetingPlayer)
+        {
+            MoveTowardsPlayer();
+        }
+        else
+        {
+            MoveAlongPath();
+        }
+    }
+
+    void MoveAlongPath()
     {
         if (path == null || path.waypoints.Length == 0)
             return;
@@ -46,8 +60,30 @@ public class Enemy : MonoBehaviour
         }
         else
         {
-            Destroy(gameObject);
-            Debug.Log("REACHED END");
+            targetingPlayer = true; // Start targeting the player
+        }
+    }
+
+    void MoveTowardsPlayer()
+    {
+        if (player == null)
+            return;
+
+        Vector3 directionToPlayer = player.position - transform.position;
+        directionToPlayer.y = 0; // Ignore vertical difference
+
+        if (directionToPlayer.magnitude > stopDistance)
+        {
+            targetPosition = player.position - directionToPlayer.normalized * stopDistance;
+            transform.position = Vector3.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
+        }
+    }
+
+    void OnDestroy()
+    {
+        if (spawner != null)
+        {
+            spawner.DecreaseEnemyCount();
         }
     }
 }
