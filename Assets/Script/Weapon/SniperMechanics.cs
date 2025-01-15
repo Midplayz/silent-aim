@@ -75,7 +75,7 @@ public class SniperMechanics : MonoBehaviour
             currentAmmoInMagazine--;
 
             GameObject bullet = Instantiate(bulletPrefab, bulletSpawnPoint.position, Quaternion.Euler(-90f, 0f, 0f));
-            bullet.GetComponent<Rigidbody>().velocity = playerCamera.transform.forward * bulletSpeed;
+            bullet.GetComponent<Rigidbody>().linearVelocity = playerCamera.transform.forward * bulletSpeed;
             bullet.GetComponent<BulletScript>().bulletSpeed = bulletSpeed; 
 
             int bulletLayer = LayerMask.NameToLayer("Bullet");
