@@ -3,7 +3,7 @@ using UnityEngine;
 public class Enemy : MonoBehaviour
 {
     public PathDefiner path;
-    public float speed = 5f; // WalkAnimation zombie is 0.25
+    public float speed = 5f;
     public float offsetRange = 10f;
     public EnemySpawner spawner;
     public Transform player;
@@ -46,7 +46,7 @@ public class Enemy : MonoBehaviour
             return;
 
         Vector3 direction = targetPosition - transform.position;
-        direction.y = 0; // Ignore vertical difference for rotation
+        direction.y = 0; 
         if (direction != Vector3.zero)
         {
             Quaternion targetRotation = Quaternion.LookRotation(direction);
@@ -54,7 +54,7 @@ public class Enemy : MonoBehaviour
         }
 
         Vector3 newPosition = Vector3.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
-        newPosition.y = initialYPosition; // Keep the Y position constant
+        newPosition.y = initialYPosition; 
         transform.position = newPosition;
 
         if (Vector3.Distance(transform.position, targetPosition) < 0.1f)
@@ -77,7 +77,7 @@ public class Enemy : MonoBehaviour
         }
         else
         {
-            targetingPlayer = true; // Start targeting the player
+            targetingPlayer = true; 
         }
     }
 
@@ -87,14 +87,14 @@ public class Enemy : MonoBehaviour
             return;
 
         Vector3 directionToPlayer = player.position - transform.position;
-        directionToPlayer.y = 0; // Ignore vertical difference for direction
+        directionToPlayer.y = 0; 
 
         if (directionToPlayer.magnitude > stopDistance)
         {
             targetPosition = player.position - directionToPlayer.normalized * stopDistance;
 
             Vector3 direction = targetPosition - transform.position;
-            direction.y = 0; // Ignore vertical difference for rotation
+            direction.y = 0; 
             if (direction != Vector3.zero)
             {
                 Quaternion targetRotation = Quaternion.LookRotation(direction);
@@ -102,7 +102,7 @@ public class Enemy : MonoBehaviour
             }
 
             Vector3 newPosition = Vector3.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
-            newPosition.y = initialYPosition; // Keep the Y position constant
+            newPosition.y = initialYPosition; 
             transform.position = newPosition;
         }
     }
@@ -110,32 +110,30 @@ public class Enemy : MonoBehaviour
     public void OnKilled(Vector3 force)
     {
         if (isDead) return;
-        Debug.Log("KILLED");
+
+        GameManager.Instance.UpdateScore(1);
+
         isDead = true;
 
-        // Disable the animator
         if (animator != null)
         {
             animator.enabled = false;
         }
 
-        // Enable ragdoll effect by setting rigidbodies to non-kinematic
         Rigidbody[] rigidbodies = GetComponentsInChildren<Rigidbody>();
         foreach (Rigidbody rb in rigidbodies)
         {
             rb.isKinematic = false;
         }
 
-        // Apply general backward force
         Vector3 backwardForce = transform.forward * -force.magnitude;
-        backwardForce.y = 0; // Ensure the force is horizontal
+        backwardForce.y = 0;
 
         foreach (Rigidbody rb in rigidbodies)
         {
             rb.AddForce(backwardForce, ForceMode.Impulse);
         }
 
-        // Destroy the enemy object after 3 seconds
         Destroy(gameObject, 3f);
     }
 

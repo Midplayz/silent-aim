@@ -26,7 +26,7 @@ public class PathDefiner : MonoBehaviour
         Gizmos.color = Color.green;
 
         Vector3 previousPoint = waypoints[0].position;
-        int resolution = 20; // if curve not smooth increase this thing
+        int resolution = 20;
 
         for (int i = 0; i < waypoints.Length - 1; i++)
         {

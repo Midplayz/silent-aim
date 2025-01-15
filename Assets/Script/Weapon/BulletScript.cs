@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class BulletScript : MonoBehaviour
 {
-    public float impactForce = 10f; // You can adjust this value
-    public float bulletSpeed = 100f; // Ensure this matches your shooting script
+    public float impactForce = 10f; 
+    public float bulletSpeed = 100f; 
     private Vector3 lastPosition;
-    public LayerMask hitMask; // Layer mask to ignore the bullet itself
+    public LayerMask hitMask; 
 
     void Start()
     {
@@ -16,7 +16,6 @@ public class BulletScript : MonoBehaviour
 
     void Update()
     {
-        // Calculate the movement for this frame
         Vector3 currentPosition = transform.position;
         Vector3 direction = currentPosition - lastPosition;
         float distance = direction.magnitude;
@@ -34,7 +33,7 @@ public class BulletScript : MonoBehaviour
 
                     hit.collider.gameObject.GetComponent<Enemy>().OnKilled(force);
                 }
-                Destroy(gameObject); // Destroy bullet on hit
+                Destroy(gameObject);
             }
         }
 
@@ -50,7 +49,7 @@ public class BulletScript : MonoBehaviour
             Vector3 force = -directionToEnemy.normalized * impactForce;
 
             other.gameObject.GetComponent<Enemy>().OnKilled(force);
-            Destroy(gameObject); // Destroy bullet on hit
+            Destroy(gameObject);
         }
     }
 }

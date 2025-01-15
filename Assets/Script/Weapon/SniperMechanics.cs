@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using UnityEditor;
+using TMPro;
 
 public class SniperMechanics : MonoBehaviour
 {
@@ -42,6 +43,10 @@ public class SniperMechanics : MonoBehaviour
     [Header("Audio")]
     [SerializeField] private SoundManager soundManager;
 
+    [Header("UI")]
+    [SerializeField] private TextMeshProUGUI magazineAmountText;
+    [SerializeField] private TextMeshProUGUI totalAmountText;
+
     void Start()
     {
         originalSniperPosition = sniper.transform.localPosition;
@@ -49,6 +54,7 @@ public class SniperMechanics : MonoBehaviour
         currentAmmoInMagazine = magazineSize;
         originalCameraPosition = playerCamera.transform.localPosition;
         originalCameraRotation = playerCamera.transform.localRotation;
+        UpdateUIText();
     }
 
     void Update()
@@ -87,10 +93,10 @@ public class SniperMechanics : MonoBehaviour
             StartCoroutine(ApplyRecoil());
             StartCoroutine(FireRateDelay());
 
-            totalAmmo--;
+            UpdateUIText();
 
             soundManager.PlayFireSound();
-            // Play muzzle flash animation
+            // muzzle flash animation here pls
         }
         else
         {
@@ -117,7 +123,6 @@ public class SniperMechanics : MonoBehaviour
     {
         isReloading = true;
 
-        // If scoping, scope out
         if (isScoping)
         {
             isScoping = false;
@@ -125,7 +130,6 @@ public class SniperMechanics : MonoBehaviour
             sniper.SetActive(true);
             scopeImage.SetActive(false);
 
-            // Reset camera and gun positions to default non-scoping view
             playerCamera.fieldOfView = normalFOV;
             sniper.transform.localPosition = originalSniperPosition;
             playerCamera.transform.localPosition = originalCameraPosition;
@@ -133,7 +137,7 @@ public class SniperMechanics : MonoBehaviour
         }
 
         soundManager.PlayActionSoundSequence("Reload");
-        // anim
+        // anim pls
 
         yield return new WaitForSeconds(reloadDuration);
 
@@ -141,9 +145,10 @@ public class SniperMechanics : MonoBehaviour
         currentAmmoInMagazine += ammoToReload;
         totalAmmo -= ammoToReload;
 
+        UpdateUIText();
+
         isReloading = false;
 
-        // If the player is still holding the scoping key, scope back in
         if (Input.GetMouseButton(1))
         {
             isScoping = true;
@@ -153,11 +158,9 @@ public class SniperMechanics : MonoBehaviour
 
     IEnumerator ApplyRecoil()
     {
-        // Gun Recoil
         Quaternion originalGunRotation = gunTransform.localRotation;
         Quaternion targetGunRotation = originalGunRotation * Quaternion.Euler(0, 0, -recoilAmount);
 
-        // Camera Recoil effect
         Vector3 originalCameraPosition = playerCamera.transform.localPosition;
         Quaternion originalCameraRotation = playerCamera.transform.localRotation;
         Quaternion targetCameraRotation = originalCameraRotation * Quaternion.Euler(-cameraRecoilAmount, 0, 0);
@@ -208,7 +211,7 @@ public class SniperMechanics : MonoBehaviour
 
     private void HandleScoping()
     {
-        if (isReloading) return; // Prevent scoping while reloading
+        if (isReloading) return; 
 
         if (Input.GetMouseButtonDown(1))
         {
@@ -223,7 +226,6 @@ public class SniperMechanics : MonoBehaviour
             sniper.SetActive(true);
             scopeImage.SetActive(false);
 
-            // Reset camera and gun positions to default non-scoping view
             playerCamera.fieldOfView = normalFOV;
             sniper.transform.localPosition = originalSniperPosition;
             playerCamera.transform.localPosition = originalCameraPosition;
@@ -254,5 +256,11 @@ public class SniperMechanics : MonoBehaviour
         {
             hasSniperMoved = true;
         }
+    }
+
+    private void UpdateUIText()
+    {
+        magazineAmountText.text = "Mag: " + currentAmmoInMagazine.ToString() + "/" + magazineSize.ToString();
+        totalAmountText.text = "Ammo: " + totalAmmo.ToString();
     }
 }
